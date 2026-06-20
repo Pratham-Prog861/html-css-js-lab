@@ -15,10 +15,16 @@ import {
   getChallengeCode, saveChallengeCode, SavedCode
 } from './services/storage';
 import { formatCode } from './services/formatter';
-import { encodeCode, decodeCode } from './services/share';
+import { encodeCode, decodeCode, encodeSharePayload, decodeSharePayload } from './services/share';
 
 function App() {
-  // Lazy initialization of current challenge index based on URL param or stored progress
+  // State for initial asynchronous decoding of shared link
+  const [isLoadingShared, setIsLoadingShared] = useState(() => {
+    const pathname = window.location.pathname;
+    const params = new URLSearchParams(window.location.search);
+    return pathname.startsWith('/s/') || !!params.get('code');
+  });
+
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const sharedId = params.get('id');
@@ -52,16 +58,10 @@ function App() {
   const [isFormatting, setIsFormatting] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(false);
 
-  // Ref to hold shared code from URL during initial load. 
-  // IMPORTANT: Immediately invoke the logic so useRef stores the RESULT, not the function.
-  const initialSharedCode = useRef<SavedCode | null>((() => {
-    const params = new URLSearchParams(window.location.search);
-    const codeParam = params.get('code');
-    if (codeParam) {
-      return decodeCode(codeParam);
-    }
-    return null;
-  })());
+  // Share Modal State
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [modalCopyFeedback, setModalCopyFeedback] = useState(false);
 
   // Debounced values for auto-updating preview
   const debouncedHtml = useDebounce(htmlCode, 500);
@@ -70,39 +70,87 @@ function App() {
 
   const currentChallenge = CHALLENGES[currentChallengeIndex];
 
-  // Load progress on mount
+  // Load progress and parse shared solutions asynchronously on mount
   useEffect(() => {
     const progress = getProgress();
     setCompletedIds(progress.completedChallengeIds);
+
+    const loadSharedState = async () => {
+      const pathname = window.location.pathname;
+      const params = new URLSearchParams(window.location.search);
+      
+      let sharedId: string | null = null;
+      let sharedCode: SavedCode | null = null;
+
+      // 1. Try path-based decoding
+      if (pathname.startsWith('/s/')) {
+        const token = pathname.substring(3);
+        if (token) {
+          try {
+            const decoded = await decodeSharePayload(token);
+            if (decoded) {
+              sharedId = decoded.id;
+              sharedCode = {
+                html: decoded.html,
+                css: decoded.css,
+                js: decoded.js
+              };
+            }
+          } catch (e) {
+            console.error("Failed to load path shared state", e);
+          }
+        }
+      }
+
+      // 2. Try query-param decoding fallback
+      if (!sharedId) {
+        const sharedIdParam = params.get('id');
+        const codeParam = params.get('code');
+        if (sharedIdParam && codeParam) {
+          sharedId = sharedIdParam;
+          try {
+            sharedCode = decodeCode(codeParam);
+          } catch (e) {
+            console.error("Failed to load query shared state", e);
+          }
+        }
+      }
+
+      if (sharedId && sharedCode) {
+        const idx = CHALLENGES.findIndex(c => c.id === sharedId);
+        if (idx !== -1) {
+          setCurrentChallengeIndex(idx);
+          setHtmlCode(sharedCode.html);
+          setCssCode(sharedCode.css);
+          setJsCode(sharedCode.js);
+          saveChallengeCode(sharedId, sharedCode);
+        }
+      }
+
+      setIsLoadingShared(false);
+      
+      // Clean the URL path to root
+      if (pathname.startsWith('/s/') || params.get('code')) {
+        window.history.replaceState({}, '', '/');
+      }
+    };
+
+    loadSharedState();
   }, []);
 
   // Initialize Code when challenge changes
   useEffect(() => {
-    // Check if we have shared code waiting to be loaded
-    if (initialSharedCode.current) {
-      const shared = initialSharedCode.current;
-      setHtmlCode(shared.html || '');
-      setCssCode(shared.css || '');
-      setJsCode(shared.js || '');
-      
-      // Consume the shared code so it doesn't persist on navigation
-      initialSharedCode.current = null;
-      
-      // Clean the URL
-      window.history.replaceState({}, '', window.location.pathname);
+    // Normal flow: Try to load saved code from local storage
+    const savedCode = getChallengeCode(currentChallenge.id);
+    
+    if (savedCode) {
+      setHtmlCode(savedCode.html);
+      setCssCode(savedCode.css);
+      setJsCode(savedCode.js);
     } else {
-      // Normal flow: Try to load saved code from local storage
-      const savedCode = getChallengeCode(currentChallenge.id);
-      
-      if (savedCode) {
-        setHtmlCode(savedCode.html);
-        setCssCode(savedCode.css);
-        setJsCode(savedCode.js);
-      } else {
-        setHtmlCode(currentChallenge.initialCode.html);
-        setCssCode(currentChallenge.initialCode.css);
-        setJsCode(currentChallenge.initialCode.js);
-      }
+      setHtmlCode(currentChallenge.initialCode.html);
+      setCssCode(currentChallenge.initialCode.css);
+      setJsCode(currentChallenge.initialCode.js);
     }
 
     setLogs([]);
@@ -157,7 +205,7 @@ function App() {
     }, 500);
   };
 
-  const handleConsole = useCallback((type: 'log' | 'error', args: any[]) => {
+  const handleConsole = useCallback((type: 'log' | 'error' | 'warn' | 'info', args: any[]) => {
     const content = args.map(a => (typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a))).join(' ');
     setLogs(prev => [...prev, { type, content, timestamp: Date.now() }]);
   }, []);
@@ -210,21 +258,46 @@ function App() {
   };
 
   const handleShare = async () => {
-    const code = { html: htmlCode, css: cssCode, js: jsCode };
-    const encoded = encodeCode(code);
-    const url = `${window.location.origin}${window.location.pathname}?id=${currentChallenge.id}&code=${encoded}`;
+    const payload = {
+      id: currentChallenge.id,
+      html: htmlCode,
+      css: cssCode,
+      js: jsCode
+    };
+    const token = await encodeSharePayload(payload);
+    const url = `${window.location.origin}/s/${token}`;
     
+    setShareUrl(url);
+    setIsShareModalOpen(true);
+    setModalCopyFeedback(false);
+
+    // Update the browser URL to the share URL immediately
+    window.history.replaceState({}, '', url);
+
     try {
       await navigator.clipboard.writeText(url);
+      setModalCopyFeedback(true);
       setCopyFeedback(true);
       setTimeout(() => setCopyFeedback(false), 2000);
     } catch(e) {
-      console.error("Failed to copy", e);
-      prompt("Copy this link to share your solution:", url);
+      console.warn("Auto-copy failed", e);
     }
   };
 
   const progressPercentage = Math.round((completedIds.length / CHALLENGES.length) * 100);
+
+  if (isLoadingShared) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-zinc-950 text-zinc-300 font-sans">
+        <div className="text-center">
+          <div className="animate-spin text-blue-500 mb-4 flex justify-center">
+            <RefreshCw className="w-8 h-8" />
+          </div>
+          <p className="text-sm font-medium animate-pulse">Restoring shared solution...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen w-full bg-zinc-950 text-zinc-300 font-sans overflow-hidden">
@@ -401,6 +474,7 @@ function App() {
                     
                     {/* Share Button */}
                     <button 
+                      id="share-solution-btn"
                       onClick={handleShare} 
                       title="Share Solution" 
                       className="text-zinc-500 hover:text-zinc-300 transition-colors"
@@ -410,6 +484,7 @@ function App() {
 
                     {/* Format Button */}
                     <button 
+                      id="format-code-btn"
                       onClick={handleFormat} 
                       title="Format Code (Ctrl+S)" 
                       className={clsx(
@@ -420,7 +495,7 @@ function App() {
                       <Wand2 size={14} />
                     </button>
 
-                    <button onClick={handleReset} title="Reset Code" className="text-zinc-500 hover:text-zinc-300 transition-colors">
+                    <button id="reset-code-btn" onClick={handleReset} title="Reset Code" className="text-zinc-500 hover:text-zinc-300 transition-colors">
                       <RotateCcw size={14} />
                     </button>
                  </div>
@@ -454,12 +529,14 @@ function App() {
               </div>
               <div className="flex items-center gap-2">
                  <button 
+                   id="refresh-preview-btn"
                    onClick={handleRefresh}
                    className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium rounded transition-colors border border-zinc-700"
                  >
                    <RefreshCw size={12} /> Refresh
                  </button>
                  <button 
+                   id="run-tests-btn"
                    onClick={handleRun}
                    className="flex items-center gap-1.5 px-3 py-1.5 bg-green-700 hover:bg-green-600 text-white text-xs font-bold rounded transition-colors shadow-sm shadow-green-900/20"
                  >
@@ -487,9 +564,65 @@ function App() {
                  validationResult={validationResult} 
                  onClear={() => setLogs([])} 
               />
-           </div>
-        </div>
+            </div>
+         </div>
       </main>
+
+      {/* Share Modal Dialog */}
+      {isShareModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#18181b] border border-zinc-800 rounded-lg max-w-md w-full p-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-bold text-white mb-2">Share Your Solution</h3>
+            <p className="text-zinc-400 text-xs mb-4">
+              Your code has been encoded into the link below. Anyone opening this link can view and run your solution.
+            </p>
+            
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  readOnly 
+                  id="share-link-input"
+                  value={shareUrl} 
+                  className="flex-1 bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs font-mono text-zinc-300 select-all focus:outline-none focus:border-blue-500"
+                />
+                <button
+                  id="modal-copy-btn"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(shareUrl);
+                      setModalCopyFeedback(true);
+                      setTimeout(() => setModalCopyFeedback(false), 2000);
+                    } catch (e) {
+                      setModalCopyFeedback(true);
+                      setTimeout(() => setModalCopyFeedback(false), 2000);
+                    }
+                  }}
+                  className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded transition-colors whitespace-nowrap"
+                >
+                  {modalCopyFeedback ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+
+              {modalCopyFeedback && (
+                <div id="share-copy-toast" className="text-green-400 text-xs font-medium animate-in fade-in duration-200">
+                  Link copied to clipboard!
+                </div>
+              )}
+
+              <div className="flex justify-end mt-2">
+                <button
+                  id="close-share-modal-btn"
+                  onClick={() => setIsShareModalOpen(false)}
+                  className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold rounded transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

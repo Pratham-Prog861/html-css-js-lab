@@ -39,7 +39,8 @@ export const CHALLENGES: Challenge[] = [
       if (!p) return { success: false, message: "No <p> tag found." };
       if (p.textContent.length < 5) return { success: false, message: "Write a bit more text in the paragraph." };
       return { success: true, message: "Paragraph added!" };
-    `
+    `,
+    hint: "Use the `<p>` tag directly below the heading: `<p>Your paragraph text here</p>`."
   },
   {
     id: 'html-anchor',
@@ -78,7 +79,8 @@ export const CHALLENGES: Challenge[] = [
       if (!img.src.includes('via.placeholder.com')) return { success: false, message: "Incorrect image source." };
       if (img.getAttribute('alt') !== 'Placeholder') return { success: false, message: "Alt text should be 'Placeholder'." };
       return { success: true, message: "Image added!" };
-    `
+    `,
+    hint: "Use the `<img>` tag with `src` and `alt` attributes: `<img src=\"https://via.placeholder.com/150\" alt=\"Placeholder\">`."
   },
   {
     id: 'html-lists',
@@ -100,7 +102,8 @@ export const CHALLENGES: Challenge[] = [
         return { success: true, message: "List created correctly!" };
       }
       return { success: false, message: "The items should be Red, Green, and Blue in that order." };
-    `
+    `,
+    hint: "Wrap list items in `<ol>`: `<ol><li>Red</li><li>Green</li><li>Blue</li></ol>`."
   },
   {
     id: 'html-unordered-lists',
@@ -118,7 +121,8 @@ export const CHALLENGES: Challenge[] = [
       if (!ul) return { success: false, message: "No <ul> tag found." };
       if (ul.querySelectorAll('li').length < 2) return { success: false, message: "Add at least 2 items." };
       return { success: true, message: "Unordered list created!" };
-    `
+    `,
+    hint: "Wrap list items in `<ul>`: `<ul><li>Milk</li><li>Eggs</li></ul>`."
   },
   {
     id: 'html-input-attributes',
@@ -136,7 +140,8 @@ export const CHALLENGES: Challenge[] = [
       if (!btn) return { success: false, message: "No button found." };
       if (!btn.hasAttribute('disabled')) return { success: false, message: "Button is not disabled." };
       return { success: true, message: "Attribute applied correctly!" };
-    `
+    `,
+    hint: "Add the `disabled` attribute directly to the `<button>` tag: `<button disabled>Can't Click Me</button>`."
   },
   {
     id: 'html-forms',
@@ -158,7 +163,8 @@ export const CHALLENGES: Challenge[] = [
       if (inputs[1].type !== 'password') return { success: false, message: "The second input should have type='password'." };
       if (!btn || btn.textContent !== 'Login') return { success: false, message: "A button with text 'Login' is required." };
       return { success: true, message: "Form structure looks good!" };
-    `
+    `,
+    hint: "Wrap the inputs and button in a `<form>` element. Use `type=\"password\"` for the password input."
   },
   {
     id: 'html-checkbox-radio',
@@ -178,7 +184,8 @@ export const CHALLENGES: Challenge[] = [
       if (radios.length < 2) return { success: false, message: "Need at least 2 radio buttons." };
       if (radios[0].name !== radios[1].name) return { success: false, message: "Radio buttons must share the same 'name' attribute." };
       return { success: true, message: "Inputs configured correctly!" };
-    `
+    `,
+    hint: "Add `<input type=\"checkbox\" id=\"terms\">` and two `<input type=\"radio\" name=\"gender\">` elements."
   },
   {
     id: 'html-table-basic',
@@ -198,7 +205,8 @@ export const CHALLENGES: Challenge[] = [
       if (rows.length < 3) return { success: false, message: "Table should have at least 3 rows (1 header + 2 data)." };
       if (!table.querySelector('th')) return { success: false, message: "Table header (th) missing." };
       return { success: true, message: "Table structure is correct!" };
-    `
+    `,
+    hint: "Use `<table>` containing `<tr>` for rows, `<th>` for headers, and `<td>` for data cells."
   },
   {
     id: 'html-semantics',
@@ -218,7 +226,8 @@ export const CHALLENGES: Challenge[] = [
       if (!header || !main || !footer) return { success: false, message: "Missing header, main, or footer." };
       if (!header.querySelector('h1')) return { success: false, message: "Header needs an <h1>." };
       return { success: true, message: "Semantic structure is perfect!" };
-    `
+    `,
+    hint: "Wrap the top heading in `<header>`, the article in `<main>`, and the copyright text in `<footer>`."
   },
 
   // ==========================================
@@ -241,7 +250,8 @@ export const CHALLENGES: Challenge[] = [
       if (style.color !== 'rgb(255, 0, 0)' && style.color !== 'red') return { success: false, message: "Color must be red." };
       if (style.fontSize !== '20px') return { success: false, message: "Font size must be 20px." };
       return { success: true, message: "Text styled correctly!" };
-    `
+    `,
+    hint: "Add CSS rules inside the stylesheet: `h1 { color: blue; font-size: 24px; }`."
   },
   {
     id: 'css-backgrounds',
@@ -261,7 +271,8 @@ export const CHALLENGES: Challenge[] = [
       if (bodyBg !== 'rgb(240, 240, 240)') return { success: false, message: "Body background should be #f0f0f0." };
       if (cardBg !== 'rgb(255, 255, 255)') return { success: false, message: "Card background should be white." };
       return { success: true, message: "Backgrounds applied!" };
-    `
+    `,
+    hint: "Set the `background-color` style on the body: `body { background-color: #f0f0f0; }`."
   },
   {
     id: 'css-box-model',
@@ -280,7 +291,8 @@ export const CHALLENGES: Challenge[] = [
       if (s.borderTopWidth !== '5px') return { success: false, message: "Border width should be 5px." };
       if (s.marginTop !== '10px') return { success: false, message: "Margin should be 10px." };
       return { success: true, message: "Box model mastered!" };
-    `
+    `,
+    hint: "Apply padding and margin to the box selector: `.box { padding: 20px; margin: 10px; }`."
   },
   {
     id: 'css-text-align',
@@ -299,7 +311,8 @@ export const CHALLENGES: Challenge[] = [
       if (h.textAlign !== 'center') return { success: false, message: "Header text not centered." };
       if (f.textAlign !== 'right') return { success: false, message: "Footer text not right-aligned." };
       return { success: true, message: "Alignment correct!" };
-    `
+    `,
+    hint: "Use the `text-align` property: `h1 { text-align: center; }`."
   },
   {
     id: 'css-borders',
@@ -317,7 +330,8 @@ export const CHALLENGES: Challenge[] = [
       if (s.borderRadius !== '50%' && s.borderRadius !== '50px') return { success: false, message: "Border radius should be 50%." };
       if (s.width !== '100px' || s.height !== '100px') return { success: false, message: "Width and height must be 100px." };
       return { success: true, message: "It's a circle!" };
-    `
+    `,
+    hint: "Set border properties: `.box { border: 2px solid black; border-radius: 5px; }`."
   },
   {
     id: 'css-display',
@@ -334,7 +348,8 @@ export const CHALLENGES: Challenge[] = [
       const s = window.getComputedStyle(document.querySelector('li'));
       if (s.display !== 'inline' && s.display !== 'inline-block') return { success: false, message: "Display must be inline or inline-block." };
       return { success: true, message: "Items are now horizontal!" };
-    `
+    `,
+    hint: "Set display to none: `.hidden-box { display: none; }`."
   },
   {
     id: 'css-opacity',
@@ -351,7 +366,8 @@ export const CHALLENGES: Challenge[] = [
       const s = window.getComputedStyle(document.querySelector('.ghost'));
       if (s.opacity !== '0.5') return { success: false, message: "Opacity should be 0.5." };
       return { success: true, message: "Spooky!" };
-    `
+    `,
+    hint: "Use the opacity property: `.ghost { opacity: 0.5; }`."
   },
 
   // ==========================================
@@ -379,7 +395,8 @@ export const CHALLENGES: Challenge[] = [
       if (style.justifyContent !== 'center') return { success: false, message: "Missing justify-content: center." };
       if (style.alignItems !== 'center') return { success: false, message: "Missing align-items: center." };
       return { success: true, message: "Box is perfectly centered!" };
-    `
+    `,
+    hint: "Set flex layout properties: `.container { display: flex; justify-content: center; align-items: center; }`."
   },
   {
     id: 'css-flex-direction',
@@ -396,7 +413,8 @@ export const CHALLENGES: Challenge[] = [
       const s = window.getComputedStyle(document.querySelector('.flex'));
       if (s.flexDirection !== 'column') return { success: false, message: "flex-direction should be column." };
       return { success: true, message: "Stacked correctly!" };
-    `
+    `,
+    hint: "Set flex direction to column: `.container { display: flex; flex-direction: column; }`."
   },
   {
     id: 'css-flex-wrap',
@@ -413,7 +431,8 @@ export const CHALLENGES: Challenge[] = [
       const s = window.getComputedStyle(document.querySelector('.container'));
       if (s.flexWrap !== 'wrap') return { success: false, message: "Enable wrapping with flex-wrap: wrap." };
       return { success: true, message: "Items wrapped!" };
-    `
+    `,
+    hint: "Use the flex-wrap property: `.container { display: flex; flex-wrap: wrap; }`."
   },
   {
     id: 'css-grid-basic',
@@ -431,7 +450,8 @@ export const CHALLENGES: Challenge[] = [
       if (s.display !== 'grid') return { success: false, message: "Use display: grid." };
       if (s.gridTemplateColumns.split(' ').length !== 2) return { success: false, message: "Should define 2 columns." };
       return { success: true, message: "Grid layout active!" };
-    `
+    `,
+    hint: "Define a grid: `.container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }`."
   },
   {
     id: 'css-position-absolute',
@@ -451,7 +471,8 @@ export const CHALLENGES: Challenge[] = [
       if (badge.position !== 'absolute') return { success: false, message: "Badge needs position: absolute." };
       if (parseInt(badge.top) > 5 || parseInt(badge.right) > 5) return { success: false, message: "Position badge at top/right (e.g., 0px)." };
       return { success: true, message: "Positioned perfectly!" };
-    `
+    `,
+    hint: "Make the parent relative and child absolute: `.parent { position: relative; } .child { position: absolute; top: 10px; right: 10px; }`."
   },
   {
     id: 'css-z-index',
@@ -468,7 +489,8 @@ export const CHALLENGES: Challenge[] = [
       const blue = window.getComputedStyle(document.querySelector('.blue'));
       if (blue.zIndex === 'auto' || parseInt(blue.zIndex) <= 1) return { success: false, message: "Blue box z-index must be higher than 1." };
       return { success: true, message: "Blue box is now on top!" };
-    `
+    `,
+    hint: "Layer elements using z-index: `.box1 { position: relative; z-index: 2; } .box2 { position: relative; z-index: 1; }`."
   },
   {
     id: 'css-hover',
@@ -515,7 +537,8 @@ export const CHALLENGES: Challenge[] = [
       const el = document.getElementById('target');
       if (el.textContent !== 'Found You!') return { success: false, message: "Text should be 'Found You!'." };
       return { success: true, message: "Element manipulated!" };
-    `
+    `,
+    hint: "Use querySelector or getElementById: `const title = document.getElementById('title');` or `const title = document.querySelector('#title');`."
   },
   {
     id: 'js-change-style',
@@ -532,7 +555,8 @@ export const CHALLENGES: Challenge[] = [
       const box = document.getElementById('box');
       if (box.style.backgroundColor !== 'purple') return { success: false, message: "Background is not purple." };
       return { success: true, message: "Style updated!" };
-    `
+    `,
+    hint: "Access style properties in JS: `element.style.color = 'red'; element.style.fontSize = '20px';`."
   },
   {
     id: '3-button-click',
@@ -550,7 +574,8 @@ export const CHALLENGES: Challenge[] = [
       btn.click();
       if (btn.textContent !== 'Clicked!') return { success: false, message: "Text didn't change on click." };
       return { success: true, message: "Event listener working!" };
-    `
+    `,
+    hint: "Add a click listener to the button: `btn.addEventListener('click', () => { ... });`."
   },
   {
     id: 'js-input-value',
@@ -573,7 +598,8 @@ export const CHALLENGES: Challenge[] = [
       
       if (res.textContent !== 'Test1234') return { success: false, message: "Result div didn't show input value." };
       return { success: true, message: "Data transfer successful!" };
-    `
+    `,
+    hint: "Get input value and assign it to textContent: `const val = input.value; output.textContent = val;`."
   },
   {
     id: 'js-toggle-class',
@@ -592,7 +618,8 @@ export const CHALLENGES: Challenge[] = [
       box.click();
       if (box.classList.contains('active') === initial) return { success: false, message: "Class was not toggled." };
       return { success: true, message: "Class toggled!" };
-    `
+    `,
+    hint: "Toggle class using classList: `element.classList.toggle('active');`."
   },
   {
     id: 'js-create-element',
@@ -610,7 +637,8 @@ export const CHALLENGES: Challenge[] = [
       if (list.children.length < 2) return { success: false, message: "No new item added." };
       if (list.lastElementChild.textContent !== 'New Item') return { success: false, message: "New item text incorrect." };
       return { success: true, message: "Element created and appended!" };
-    `
+    `,
+    hint: "Use createElement and appendChild: `const newLi = document.createElement('li'); newLi.textContent = 'New Item'; list.appendChild(newLi);`."
   },
   {
     id: 'js-remove-element',
@@ -626,7 +654,8 @@ export const CHALLENGES: Challenge[] = [
     validationCode: `
       if (document.getElementById('remove-me')) return { success: false, message: "Element still exists." };
       return { success: true, message: "Element deleted!" };
-    `
+    `,
+    hint: "Remove an element: `child.remove();` or `parent.removeChild(child);`."
   },
   {
     id: 'js-math-random',
@@ -646,7 +675,8 @@ export const CHALLENGES: Challenge[] = [
       if (isNaN(n)) return { success: false, message: "Content is not a number." };
       if (n < 0 || n > 10) return { success: false, message: "Number out of range (0-10)." };
       return { success: true, message: "Random number generated!" };
-    `
+    `,
+    hint: "Generate a random number: `const rand = Math.floor(Math.random() * 10) + 1;`."
   },
   {
     id: 'js-array-loop',
@@ -664,7 +694,8 @@ export const CHALLENGES: Challenge[] = [
       if (c.children.length !== 4) return { success: false, message: "Expected 4 divs." };
       if (c.children[0].style.backgroundColor !== 'red') return { success: false, message: "First div not red." };
       return { success: true, message: "Array rendered!" };
-    `
+    `,
+    hint: "Loop through array colors: `colors.forEach(color => { ... });` or use a standard `for` loop."
   },
   {
     id: 'js-conditions',
@@ -681,7 +712,8 @@ export const CHALLENGES: Challenge[] = [
       const msg = document.getElementById('msg');
       if (msg.textContent !== 'Pass') return { success: false, message: "Logic incorrect for score 75." };
       return { success: true, message: "Condition logic works!" };
-    `
+    `,
+    hint: "Check if input value matches expected string: `if (val === 'google') { ... }`."
   },
 
   // ==========================================
@@ -707,7 +739,8 @@ export const CHALLENGES: Challenge[] = [
       dec.click();
       if (countEl.textContent !== '0') return { success: false, message: "Decrement failed." };
       return { success: true, message: "Counter functional!" };
-    `
+    `,
+    hint: "Add event listeners for increment and decrement: `count++; countDisplay.textContent = count;`."
   },
   {
     id: 'js-color-flipper',
@@ -726,7 +759,8 @@ export const CHALLENGES: Challenge[] = [
       btn.click();
       if (document.body.style.backgroundColor === start && document.body.style.backgroundColor === '') return { success: false, message: "Background didn't change." };
       return { success: true, message: "Colors flipping!" };
-    `
+    `,
+    hint: "Generate a random color index and set body style: `document.body.style.backgroundColor = colors[randomIndex];`."
   },
   {
     id: 'js-modal',
@@ -752,7 +786,8 @@ export const CHALLENGES: Challenge[] = [
       const style2 = window.getComputedStyle(modal);
       if (style2.display !== 'none') return { success: false, message: "Modal didn't close." };
       return { success: true, message: "Modal works!" };
-    `
+    `,
+    hint: "Open and close the modal by changing styling: `modal.style.display = 'block';` or `modal.classList.add('show');`."
   },
   {
     id: 'js-accordion',
@@ -773,7 +808,8 @@ export const CHALLENGES: Challenge[] = [
       btn.click();
       if (panel.style.display !== 'none') return { success: false, message: "Panel didn't close." };
       return { success: true, message: "Accordion works!" };
-    `
+    `,
+    hint: "Toggle display: `content.style.display = content.style.display === 'block' ? 'none' : 'block';`."
   },
   {
     id: 'js-tabs',
@@ -794,7 +830,8 @@ export const CHALLENGES: Challenge[] = [
       if (document.getElementById('t2').style.display === 'none') return { success: false, message: "Tab 2 didn't open." };
       if (document.getElementById('t1').style.display !== 'none') return { success: false, message: "Tab 1 didn't close." };
       return { success: true, message: "Tabs functional!" };
-    `
+    `,
+    hint: "Loop through tabs to remove active class, add it to clicked tab, and show/hide corresponding panels."
   },
 
   // ==========================================
@@ -817,7 +854,8 @@ export const CHALLENGES: Challenge[] = [
       if (!v.hasAttribute('controls')) return { success: false, message: "Missing controls attribute." };
       if (v.getAttribute('width') !== '300') return { success: false, message: "Width should be 300." };
       return { success: true, message: "Video player ready!" };
-    `
+    `,
+    hint: "Add the video tag: `<video src=\"video.mp4\" controls width=\"400\"></video>`."
   },
   {
     id: 'html-textarea',
@@ -835,7 +873,8 @@ export const CHALLENGES: Challenge[] = [
       if (!t) return { success: false, message: "No textarea." };
       if (t.getAttribute('rows') !== '4') return { success: false, message: "Rows should be 4." };
       return { success: true, message: "Text area created!" };
-    `
+    `,
+    hint: "Add the textarea tag: `<textarea rows=\"4\" cols=\"50\" placeholder=\"Type here...\"></textarea>`."
   },
   {
     id: 'html-select',
@@ -853,7 +892,8 @@ export const CHALLENGES: Challenge[] = [
       if (!s) return { success: false, message: "No select tag." };
       if (s.options.length < 3) return { success: false, message: "Need 3 options." };
       return { success: true, message: "Dropdown created!" };
-    `
+    `,
+    hint: "Wrap options inside select: `<select><option value=\"apple\">Apple</option><option value=\"banana\">Banana</option></select>`."
   },
   {
     id: 'css-shadows',
@@ -870,7 +910,8 @@ export const CHALLENGES: Challenge[] = [
       const s = window.getComputedStyle(document.querySelector('.card'));
       if (s.boxShadow === 'none') return { success: false, message: "No shadow detected." };
       return { success: true, message: "Shadow applied!" };
-    `
+    `,
+    hint: "Add shadow: `.card { box-shadow: 2px 2px 8px rgba(0,0,0,0.1); }`."
   },
   {
     id: 'css-transform',
@@ -888,7 +929,8 @@ export const CHALLENGES: Challenge[] = [
       if (s.transform === 'none') return { success: false, message: "No transform applied." };
       // matrix check is complex, checking if it's not none is usually enough for simple validation
       return { success: true, message: "Rotated!" };
-    `
+    `,
+    hint: "Apply rotate transform: `.box { transform: rotate(45deg); }`."
   },
   {
     id: 'css-overflow',
@@ -905,7 +947,8 @@ export const CHALLENGES: Challenge[] = [
       const s = window.getComputedStyle(document.querySelector('.box'));
       if (s.overflow !== 'scroll' && s.overflowY !== 'scroll') return { success: false, message: "Overflow should be scroll." };
       return { success: true, message: "Scrollbars active!" };
-    `
+    `,
+    hint: "Set overflow scroll: `.box { overflow: scroll; }` or `overflow: auto;`."
   },
   {
     id: 'css-pseudo-first',
@@ -924,7 +967,8 @@ export const CHALLENGES: Challenge[] = [
       if (window.getComputedStyle(p1).fontWeight !== '700' && window.getComputedStyle(p1).fontWeight !== 'bold') return { success: false, message: "First child not bold." };
       if (window.getComputedStyle(p2).fontWeight === '700') return { success: false, message: "Only first child should be bold." };
       return { success: true, message: "Selector working!" };
-    `
+    `,
+    hint: "Target the first paragraph: `p:first-of-type { font-weight: bold; }`."
   },
 
   // ==========================================
@@ -949,7 +993,8 @@ export const CHALLENGES: Challenge[] = [
       btn.click();
       if (out.textContent !== '5') return { success: false, message: "Length calculation incorrect." };
       return { success: true, message: "Calculation correct!" };
-    `
+    `,
+    hint: "Check the value's length property: `const len = input.value.length; charCount.textContent = len;`."
   },
   {
     id: 'js-timer',
@@ -976,7 +1021,8 @@ export const CHALLENGES: Challenge[] = [
       // Alternative: Check if code contains setTimeout
       // Simplification for this environment:
       return { success: true, message: "If text changes after 1s, you win! (Auto-pass for async limitation)" };
-    `
+    `,
+    hint: "Increment seconds with setInterval: `setInterval(() => { seconds++; timerDisplay.textContent = seconds; }, 1000);`."
   },
   {
     id: 'js-prevent-default',
@@ -1001,7 +1047,8 @@ export const CHALLENGES: Challenge[] = [
       
       if (cancelled) return { success: true, message: "Navigation prevented!" };
       return { success: false, message: "Link still navigates." };
-    `
+    `,
+    hint: "Call preventDefault on the event object: `link.addEventListener('click', (e) => { e.preventDefault(); });`."
   },
   {
     id: 'js-template-literal',
@@ -1018,7 +1065,8 @@ export const CHALLENGES: Challenge[] = [
       const msg = document.getElementById('msg');
       if (msg.textContent !== 'Hello Alice') return { success: false, message: "Text should be 'Hello Alice'." };
       return { success: true, message: "String interpolated!" };
-    `
+    `,
+    hint: "Use template literal backticks: `msg.textContent = `Hello ${name}`;`."
   }
 ];
 

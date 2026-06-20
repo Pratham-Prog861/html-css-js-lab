@@ -18,6 +18,7 @@ const Console: React.FC<ConsoleProps> = ({ logs, validationResult, onClear }) =>
           <span className="text-xs font-semibold uppercase tracking-wider">Console</span>
         </div>
         <button 
+          id="console-clear-btn"
           onClick={onClear} 
           className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
         >

@@ -45,19 +45,9 @@ const Preview: React.FC<PreviewProps> = ({ html, css, js, refreshTrigger, onCons
       <!DOCTYPE html>
       <html>
         <head>
-          <style>
-            ${css}
-          </style>
-          <style>
-            body { font-family: sans-serif; padding: 1rem; color: #111; }
-          </style>
-        </head>
-        <body>
-          ${html}
-          
-          <!-- System Scripts -->
+          <!-- Trigger: ${refreshTrigger} -->
+          <!-- Console Proxy (Must be first to capture early logs) -->
           <script>
-            // Console Proxy
             (function() {
               const send = (level, args) => {
                 try {
@@ -88,11 +78,32 @@ const Preview: React.FC<PreviewProps> = ({ html, css, js, refreshTrigger, onCons
                 originalError.apply(console, args);
               };
 
+              const originalWarn = console.warn;
+              console.warn = (...args) => {
+                send('warn', args);
+                originalWarn.apply(console, args);
+              };
+
+              const originalInfo = console.info;
+              console.info = (...args) => {
+                send('info', args);
+                originalInfo.apply(console, args);
+              };
+
               window.onerror = (msg, url, line) => {
                 send('error', [msg + ' (Line: ' + line + ')']);
               };
             })();
           </script>
+          <style>
+            ${css}
+          </style>
+          <style>
+            body { font-family: sans-serif; padding: 1rem; color: #111; }
+          </style>
+        </head>
+        <body>
+          ${html}
           
           <!-- User JS -->
           <script>
